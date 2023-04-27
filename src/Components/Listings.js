@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 import {
   MapContainer,
@@ -22,6 +23,8 @@ import {
   CardMedia,
   CardContent,
   CircularProgress,
+  IconButton,
+  CardActions,
 } from "@mui/material";
 
 // Map icons
@@ -39,6 +42,7 @@ function Listings() {
   // fetch("http://localhost:8000/apiv1/listings/")
   //   .then((response) => response.json())
   //   .then((data) => console.log(data));
+  const navigate = useNavigate();
   
   const houseIcon = new Icon({
     iconUrl: houseIconPng,
@@ -55,8 +59,8 @@ function Listings() {
     iconSize: [40, 40],
   });
 
-  const [latitude, setLatitude] = useState(9.081097987194463);
-  const [longitude, setLongitude] = useState(7.400987794504887);
+  const [latitude, setLatitude] = useState(51.48740865233002);
+  const [longitude, setLongitude] = useState(-0.12667052265135625);
 
 
   function GoEast() {
@@ -82,7 +86,7 @@ function Listings() {
     async function GetAllListings() {
       try {
         const response = await Axios.get(
-          "http://localhost:8000/apiv1/listings/",
+          "http://localhost:8000/api/v1/listings/",
           { cancelToken: source.token }
         );
 
@@ -141,6 +145,7 @@ function Listings() {
                 component="img"
                 image={listing.picture1}
                 alt={listing.title}
+                onClick={() => navigate(`/listings/${listing.id}`)}
               />
               <CardContent>
                 <Typography variant="body2">
@@ -184,14 +189,11 @@ function Listings() {
                 </Typography>
               )}
 
-              {/* <CardActions disableSpacing>
-            <IconButton aria-label="add to favorites">
-              <FavoriteIcon />
-            </IconButton>
-            <IconButton aria-label="share">
-              <ShareIcon />
-            </IconButton>
-          </CardActions> */}
+              <CardActions disableSpacing>
+                <IconButton aria-label="add to favorites">
+                  {listing.seller_agency_name}
+                </IconButton>
+              </CardActions>
             </Card>
           );
         })}
@@ -239,15 +241,6 @@ function Listings() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              <Polyline positions={polyOne} weight={10} color="#ff6c38" />
-              <Polygon
-                positions={polygonOne}
-                color="yellow"
-                fillColor="blue"
-                fillOpacity={0.9}
-                opacity="0"
-              />
-
               {allListings.map((listing) => {
                 function IconDisplay() {
                   if (listing.listing_type === "House") {
@@ -262,10 +255,7 @@ function Listings() {
                   <Marker
                     key={listing.id}
                     icon={IconDisplay()}
-                    position={[
-                      listing.location.coordinates[0],
-                      listing.location.coordinates[1],
-                    ]}
+                    position={[listing.latitude, listing.longitude]}
                   >
                     <Popup>
                       <Typography variant="h5">{listing.title}</Typography>
@@ -277,11 +267,16 @@ function Listings() {
                           width: "18rem",
                           cursor: "pointer",
                         }}
+                        onClick={() => navigate(`/listings/${listing.id}`)}
                       />
                       <Typography variant="body1">
                         {listing.description.substring(0, 150)}...
                       </Typography>
-                      <Button variant="contained" fullWidth>
+                      <Button
+                        variant="contained"
+                        fullWidth
+                        onClick={() => navigate(`/listings/${listing.id}`)}
+                      >
                         Details
                       </Button>
                     </Popup>

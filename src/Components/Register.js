@@ -1,52 +1,81 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { Axios } from 'axios';
+import { useImmerReducer } from 'use-immer';
 
 
 // MUI Imports
 import {
   Grid,
-  AppBar,
   Typography,
   Button,
-  Card,
-  CardHeader,
-  CardMedia,
-  CardContent,
-  CircularProgress,
   TextField,
   
 } from "@mui/material";
 
 function Register() {
     const navigate = useNavigate();
+
+    const initialState = {
+      usernameValue: "",
+      emailValue: "",
+      passwordValue: "",
+      password2Value: "",
+      sendRequest: 0,
+    };
+
+
+    function ReducerFuction(draft, action) {
+      switch (action.type) {
+          case 'catchUsernameChange':
+              draft.usernameValue = action.usernameChosen;
+              break;
+          case 'catchEmailChange':
+              draft.emailValue = action.emailChosen;
+              break;
+          case 'catchPasswordChange':
+              draft.passwordValue = action.passwordChosen;
+              break;
+          case 'catchPassword2Change':
+              draft.password2Value = action.password2Chosen;
+              break;
+          case 'changeSendRequest':
+              draft.sendRequest = draft.sendRequest + 1;
+              break;
+      }
+    }
+
+    const [state, dispatch] = useImmerReducer(ReducerFuction, initialState);
     
-    const [sendRequest, setSendRequest] = useState(false)
+   
    
     function FormSubmit(e) {
         e.preventDefault();
         console.log('The form has been submitted');
-        setSendRequest(!sendRequest)
+        dispatch({type: 'changeSendRequest'})
     }
 
     useEffect(() => {
-        if (sendRequest) {
+        if (state.sendRequest) {
           const source = Axios.CancelToken.source();
           async function SignUp() {
             try {
               const response = await Axios.post(
                 "http://localhost:8000/apiv1-auth-djoser/users/",
                 {
-                  username: 'moses',
-                  email: "testing123@gmail.com",
-                  password: "test123",
-                  re_password: "test123",
+                  username: state.usernameValue,
+                  email: state.emailValue,
+                  password: state.passwordValue,
+                  re_password: state.password2Value,
                 },
-                { cancelToken: source.token }
+                {
+                  cancelToken: source.token,
+                }
               );
-              console.log(response);
+                console.log(response);
+                navigate('/')
             } catch (error) {
-                console.log(error.response)
+              console.log(error.response);
             }
           }
           SignUp();
@@ -54,7 +83,7 @@ function Register() {
             source.cancel();
           };
         }
-    }, [sendRequest]);
+    }, [state.sendRequest]);
 
   return (
     <div
@@ -78,11 +107,30 @@ function Register() {
             label="Username"
             variant="outlined"
             fullWidth
+            value={state.usernameValue}
+            onChange={(e) =>
+              dispatch({
+                type: "catchUsernameChange",
+                usernameChosen: e.target.value,
+              })
+            }
           />
         </Grid>
 
         <Grid item container style={{ marginTop: "1rem" }}>
-          <TextField id="email" label="Email" variant="outlined" fullWidth />
+          <TextField
+            id="email"
+            label="Email"
+            variant="outlined"
+            fullWidth
+            value={state.emailValue}
+            onChange={(e) =>
+              dispatch({
+                type: "catchEmailChange",
+                emailChosen: e.target.value,
+              })
+            }
+          />
         </Grid>
 
         <Grid item container style={{ marginTop: "1rem" }}>
@@ -91,6 +139,13 @@ function Register() {
             label="Password"
             variant="outlined"
             fullWidth
+            value={state.passwordValue}
+            onChange={(e) =>
+              dispatch({
+                type: "catchPasswordChange",
+                passwordChosen: e.target.value,
+              })
+            }
           />
         </Grid>
 
@@ -100,6 +155,13 @@ function Register() {
             label="Confirm Password"
             variant="outlined"
             fullWidth
+            value={state.password2Value}
+            onChange={(e) =>
+              dispatch({
+                type: "catchPassword2Change",
+                password2Chosen: e.target.value,
+              })
+            }
           />
         </Grid>
 
