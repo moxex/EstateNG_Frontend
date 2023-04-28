@@ -118,7 +118,7 @@ function AgencyDetail() {
               variant="h5"
               style={{ textAlign: "center", marginTop: "1rem" }}
             >
-              <span style={{ color: "green", fontWeight: "bolder" }}>
+              <span style={{ color: "#ff6c38", fontWeight: "bolder" }}>
                 {state.userProfile.agencyName}
               </span>
             </Typography>
@@ -156,9 +156,9 @@ function AgencyDetail() {
                   component="img"
                   height="140"
                   image={
-                  	`http//localhost:8000${listing.picture1}`
-                  		? `http://localhost:8000${listing.picture1}`
-                  		: defaultProfilePicture
+                    `http//localhost:8000${listing.picture1}`
+                      ? `http://localhost:8000${listing.picture1}`
+                      : defaultProfilePicture
                   }
                   image={
                     listing.picture1 ? listing.picture1 : defaultProfilePicture
